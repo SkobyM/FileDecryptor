@@ -1,0 +1,127 @@
+FileEncryptor
+-----------------------------------------------
+package com.mycompany.fileencryptor;
+import java.io.*;
+import java.util.*;
+
+public class FileEncryptor {
+
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        System.out.print("Enter input file name (example, 'in.txt'): ");
+        String inputFileName = in.nextLine();
+        System.out.print("Enter output file name (example, 'out.txt'): ");
+        String outputFileName = in.nextLine();
+        System.out.print("Enter key: ");
+        int key = 0;
+        try {
+            key = in.nextInt();
+        } catch (InputMismatchException e) {
+            System.out.println("Error: Only numbers are accepted for the key.");
+            return; 
+        }
+        
+       
+        boolean success = encryptFile(inputFileName, outputFileName, key);
+        if (success) {
+            System.out.println("File encryption completed successfully.");
+        } else {
+            System.out.println("File encryption failed.");
+        }
+    }
+   
+    public static boolean encryptFile(String inputFileName, String outputFileName, int key) {
+        File inFile = new File(inputFileName);
+        if (!inFile.exists()) {
+            System.out.println("Input file does not exist.");
+            return false;
+        }
+       
+        try (Scanner fileScanner = new Scanner(inFile);
+             PrintWriter fileWriter = new PrintWriter(outputFileName)) {
+            while (fileScanner.hasNextLine()) {
+                String text = fileScanner.nextLine();
+                String encryptedText = encryptString(text, key);
+                fileWriter.println(encryptedText);
+            }
+        } catch (IOException e) {
+            System.out.println("Error during file processing: " + e.getMessage());
+            return false;
+        }
+        return true;
+    }
+   
+    public static String encryptString(String inputString, int aKey) {
+        StringBuilder outputString = new StringBuilder();
+        for (int i = 0; i < inputString.length(); i++) {
+            char encryptedChar = (char) (inputString.charAt(i) + aKey);
+            outputString.append(encryptedChar);
+        }
+        return outputString.toString();
+    }
+}
+
+
+
+-----------------------------------------
+FileDecryptor
+-------------------------------------------
+
+
+package com.mycompany.filedecryptor;
+
+import java.io.*;
+import java.util.Scanner;
+
+public class FileDecryptor {
+
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        System.out.print("Enter encrypted file name (example, “out.txt”): ");
+        String encryptedFileName = input.nextLine();
+        System.out.print("Enter output file name for the decrypted content (example, “toReal.txt”): ");
+        String decryptedFileName = input.nextLine();
+        System.out.print("Enter decryption key: ");
+        int key = input.nextInt();
+
+        boolean success = decryptFile(encryptedFileName, decryptedFileName, key);
+        if (success) {
+            System.out.println("File decryption completed successfully.");
+        } else {
+            System.out.println("File decryption failed.");
+        }
+        
+        
+    }
+    
+    public static boolean decryptFile(String encryptedFileName, String decryptedFileName, int key) {
+        File encryptedFile = new File(encryptedFileName);
+        if (!encryptedFile.exists()) {
+            System.out.println("Encrypted file does not exist.");
+            return false;
+        }
+        
+        try (Scanner fileScanner = new Scanner(encryptedFile);
+             PrintWriter fileWriter = new PrintWriter(decryptedFileName)) {
+            while (fileScanner.hasNextLine()) {
+                String encryptedText = fileScanner.nextLine();
+                String decryptedText = decryptString(encryptedText, key);
+                fileWriter.println(decryptedText);
+            }
+        } catch (IOException e) {
+            System.out.println("An error occurred during file processing: " + e.getMessage());
+            return false;
+        }
+        return true;
+    }
+    
+    public static String decryptString(String encryptedString, int aKey) {
+        StringBuilder decryptedString = new StringBuilder();
+        for (int i = 0; i < encryptedString.length(); i++) {
+            char decryptedChar = (char) (encryptedString.charAt(i) - aKey);
+            decryptedString.append(decryptedChar);
+        }
+        return decryptedString.toString();
+    }
+}
+
